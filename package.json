@@ -1,0 +1,24 @@
+{
+  "name": "opening-notification-app",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron-forge/cli": "^6.4.2",
+    "electron": "^26.0.0"
+  },
+  "dependencies": {
+    "@emailjs/nodejs": "^2.2.0",
+    "electron-store": "^8.1.0",
+    "node-webcam": "^0.8.2",
+    "uuid": "^9.0.0"
+  }
+}

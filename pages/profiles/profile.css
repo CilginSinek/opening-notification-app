@@ -1,0 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap");
+body {
+  font-family: "Open Sans", sans-serif;
+  background-color: #040D12;
+  color: #efe1d1;
+}
+.btn {
+  cursor: pointer;
+  color: #efe1d1;
+  padding: 10px 15px;
+  text-align: center;
+  background-color: #183D3D;
+  border-radius: 10px;
+  border: 0px;
+  font-size: larger;
+  font-family: "Open Sans", sans-serif;
+}
+.btn:hover {
+  background-color: #5C8374;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+}
+.uppercontainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.save{
+  font-weight: bolder;
+  margin-bottom: 0px;
+}
+#QuestDiv{
+  display: none;
+  flex-direction: column;
+}
+#QuestAnswerDiv{
+  display: none;
+  flex-direction: column;
+}
+form {
+  display: flex;
+  flex-direction: column;
+}
+select {
+  min-width: 130px;
+  padding: 10px 15px;
+  border: 0px;
+  height: 50px;
+  font-size: larger;
+  font-weight: bold;
+  font-family: "Open Sans", sans-serif;
+  border-radius: 10px;
+  color: #efe1d1;
+  background-color: #183D3D;
+}
+select:focus {
+  outline: none;
+}
+input[type="text"] {
+  color:#efe1d1;
+  background-color: #040D12;
+  width: 400px;
+  height: 30px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: bolder;
+  font-size: 20px;
+  padding: 0px 15px;
+  border: 0px;
+  border-bottom: 2px solid white;
+}
+input{
+  margin-bottom: 20px;
+}
+input[type="email"] {
+  color:#efe1d1;
+  background-color: #040D12;
+  width: 400px;
+  height: 30px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: bolder;
+  font-size: 20px;
+  padding: 0px 15px;
+  border: 0px;
+  border-bottom: 2px solid white;
+}
+input:focus {
+  outline: none;
+}

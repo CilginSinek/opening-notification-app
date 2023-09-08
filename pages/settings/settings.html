@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <link rel="stylesheet" href="settings.css" />
+    <title>System Settings</title>
+  </head>
+  <body>
+    <div>
+      <form id="settingForm">
+        <label for="service_id">Service Id</label>
+        <input type="text" maxlength="24" id="service_id" name="service_id" />
+
+        <label for="template_id">Template Id</label>
+        <input type="text" maxlength="24" id="template_id" name="template_id" />
+
+        <label for="public_key">Public Key</label>
+        <input type="text" maxlength="24" id="public_key" name="public_key" />
+
+        <input type="submit" class="btn save" value="Save">
+      </form>
+    </div>
+
+    <script src="./settings.js"></script>
+  </body>
+</html>

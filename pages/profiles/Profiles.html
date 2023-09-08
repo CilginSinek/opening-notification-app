@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="profile.css" />
+    <title>Profiles</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="uppercontainer">
+        <div class="profiles-body"></div>
+        <div class="buttons">
+          <button class="btn" id="create">Create New One</button>
+          <button class="btn" id="delete">Delete</button>
+        </div>
+      </div>
+      <div class="downcontainer">
+        <form id="form">
+          <label for="name">Name:</label>
+          <input type="text" maxlength="64" name="name" id="name" required />
+
+          <label for="mail">Mail:</label>
+          <input id="mail" type="email" name="mail" required />
+
+          <label for="openerPic">Can we take a photo of the person who opened it?</label>
+          <input id="openerPic" type="checkbox" name="openerPic" id="opener" />
+
+          <label for="QuestCheck">Shall we question the person who opened it?</label>
+          <input type="checkbox" name="QuestCheck" id="QuestCheck" />
+
+          <div id="QuestDiv">
+            <label for="Quest">Shall we question the person who opened it:</label>
+            <input type="text" name="Quest" id="Quest" />
+          </div>
+
+          <div id="QuestAnswerDiv">
+            <label for="QuestAnswer">Question Answer:</label>
+            <input type="text" name="QuestAnswer" id="QuestAnswer" />
+          </div>
+
+
+          <input class="btn save" type="submit" value="Save" />
+        </form>          
+      </div>
+    </div>
+
+    <script src="./Profile.js"></script>
+  </body>
+</html>
