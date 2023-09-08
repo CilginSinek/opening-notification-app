@@ -183,6 +183,12 @@ const createQuestWindow = () => {
   settings.loadFile(path.join(__dirname, "pages/quest/quest.html"));
 };
 
+//? Start with Windows Open
+app.setLoginItemSettings({
+  openAtLogin: true    
+})
+
+
 let tray = null;
 app.whenReady().then(() => {
   if (store.get("status")) {
