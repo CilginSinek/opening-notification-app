@@ -1,6 +1,6 @@
 # Opening Notification App
 
-![AppView!](/assets/app.png)
+![AppView!](https://github.com/CilginSinek/opening-notification-app/blob/main/assets/App.png?raw=true)
 
 ## İçerik
 - [Açıklama-Kullanım](#Kullanim-Aciklama)
