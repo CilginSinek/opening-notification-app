@@ -192,9 +192,9 @@ const createQuestWindow = () => {
 };
 
 //? Start with Windows Open
-app.setLoginItemSettings({
-  openAtLogin: true,
-});
+// app.setLoginItemSettings({
+//   openAtLogin: true,
+// });
 
 let tray = null;
 app.whenReady().then(() => {
