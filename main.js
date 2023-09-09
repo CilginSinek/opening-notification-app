@@ -10,7 +10,15 @@ const path = require("path");
 const Store = require("electron-store");
 const { v4: uuidv4 } = require("uuid");
 const NodeWebcam = require("node-webcam");
-const emailjs = require("@emailjs/nodejs");
+const sgMail = require("@sendgrid/mail");
+
+const msg = {
+  to: "",
+  from: "",
+  subject: "",
+  text: "",
+  html: ""
+};
 
 //! Store schema
 const schema = {
@@ -31,12 +39,12 @@ const schema = {
 
 //! Pic Options
 const opts = {
-  width: 1280,
-  height: 720,
-  quality: 100,
-  frames: 60,
+  width: 300,
+  height: 200,
+  quality: 1,
+  frames: 1,
   delay: 0,
-  saveShots: true,
+  saveShots: false,
   output: "png",
   device: false,
   callbackReturn: "base64",
@@ -158,7 +166,7 @@ const createSettingsWindow = () => {
   const settings = new BrowserWindow({
     icon: path.join(__dirname, "icon/icon.png"),
     width: 300,
-    height: 310,
+    height: 325,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contentSecurityPolicy: "script-src 'self' 'unsafe-inline';",
@@ -185,56 +193,77 @@ const createQuestWindow = () => {
 
 //? Start with Windows Open
 app.setLoginItemSettings({
-  openAtLogin: true    
-})
-
+  openAtLogin: true,
+});
 
 let tray = null;
 app.whenReady().then(() => {
+  // store.set("status",false)
   if (store.get("status")) {
     const profiles = store.get("Profiles");
     const selected = profiles.find(
       (item) => item.id === store.get("selectedProfileId")
     );
-    if (selected.QuestCheck) {
+    if (selected.QuestCheck === true) {
       createQuestWindow();
     } else {
-      const { service_id, template_id, public_key } = store.get("settings");
-      if (selected.openerPic) {
+      const { api_key, from_mail } = store.get("settings");
+      if (selected.openerPic === true) {
         NodeWebcam.capture("test_picture", opts, function (err, data) {
           if (err) {
+            console.log(err);
             const notification = new Notification({
               title: "Error",
               body: err,
             });
-          }
-          emailjs
-            .send(
-              service_id,
-              template_id,
-              { context: data },
-              { publicKey: public_key }
-            )
-            .catch((err) => {
-              const notification = new Notification({
-                title: "Error",
-                body: err,
+          } else {
+            sgMail.setApiKey(api_key);
+            msg.from = from_mail;
+            msg.to = selected.mail;
+            msg.subject = "Notification App";
+            msg.text = `Bilgisayariniz ${new Date()} tarihinde fotograftaki sahıs tarafindan acildi.`;
+            msg.html = `<div><img src=${data} ></div>`;
+            console.log(msg)
+            sgMail
+              .send(msg)
+              .then((e) => {
+                console.log(e);
+              })
+              .catch((error) => {
+                console.log(error);
+                if (error.response) {
+                  console.error(error.response.body);
+                }
               });
-            });
+          }
         });
       } else {
-        emailjs
-          .send(service_id, template_id, {}, { publicKey: public_key })
-          .catch((err) => {
+        sgMail.setApiKey(api_key);
+        msg.from = from_mail;
+        msg.to = selected.mail;
+        msg.subject = "Notification App";
+        msg.text = `Bilgisayarınızı ${new Date()} tarihinde açıldı.`;
+        msg.html = "";
+        sgMail
+          .send(msg)
+          .then((e) => {
+            console.log(e);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response) {
+              console.error(error.response.body);
+            }
             const notification = new Notification({
               title: "Error",
-              body: err,
+              body: error,
             });
           });
       }
+      tray = new Tray(path.join(__dirname, "icon/icon.png"));
+      tray.setContextMenu(contextMenu);
     }
   } else {
-    console.log(store.get("selectedProfileId"));
     createWindow();
   }
 
@@ -312,9 +341,7 @@ app.whenReady().then(() => {
     store.set("Profiles", newProfiles);
     store.set("status", false);
     BrowserWindow.getAllWindows().forEach((win) => {
-      if (BrowserWindow.getFocusedWindow.id == win.id) {
-        win.webContents.reload();
-      }
+      win.webContents.reload();
     });
   });
   //* Open Profile Settings
@@ -325,51 +352,72 @@ app.whenReady().then(() => {
   ipcMain.on("setSettings", (e, data) => {
     store.set("settings", data);
     store.set("status", false);
+    BrowserWindow.getFocusedWindow().close();
     BrowserWindow.getAllWindows().forEach((win) => {
-      if (BrowserWindow.getFocusedWindow.id !== win.id) {
-        win.webContents.reload();
-      }
+      win.webContents.reload();
     });
-    BrowserWindow.getFocusedWindow.close();
   });
   //* Quest Response
   ipcMain.on("questResponse", (e, data) => {
     if (!data.result) {
-      const { service_id, template_id, public_key } = store.get("settings");
-      if (data.openerPic) {
-        NodeWebcam.capture("OpenerPic", opts, function (err, data) {
+      const { api_key, from_mail } = store.get("settings");
+      const selected = store
+        .get("Profiles")
+        .find((item) => item.id === store.get("selectedProfileId"));
+      if (data.openerPic === true) {
+        NodeWebcam.capture("test_picture", opts, function (err, data) {
           if (err) {
+            console.log(err);
             const notification = new Notification({
               title: "Error",
               body: err,
             });
-          }
-          emailjs
-            .send(
-              service_id,
-              template_id,
-              { context: data },
-              { publicKey: public_key }
-            )
-            .catch((err) => {
-              const notification = new Notification({
-                title: "Error",
-                body: err,
+          } else {
+            sgMail.setApiKey(api_key);
+            msg.from = from_mail;
+            msg.to = selected.mail;
+            msg.subject = "Notification App";
+            msg.text = `Bilgisayariniz ${new Date()} tarihinde fotograftaki sahıs tarafindan acildi.`;
+            msg.html = `<div><img src=${data} ></div>`;
+            console.log(msg)
+            sgMail
+              .send(msg)
+              .then((e) => {
+                console.log(e);
+              })
+              .catch((error) => {
+                console.log(error);
+                if (error.response) {
+                  console.error(error.response.body);
+                }
               });
-            });
+          }
         });
       } else {
-        emailjs
-          .send(service_id, template_id, {}, { publicKey: public_key })
-          .catch((err) => {
+        sgMail.setApiKey(api_key);
+        msg.from = from_mail;
+        msg.to = selected.mail;
+        msg.subject = "Notification App";
+        msg.text = `Bilgisayarınızı ${new Date()} tarihinde açıldı.`;
+        msg.html = "";
+        sgMail
+          .send(msg)
+          .then((e) => {
+            console.log(e);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response) {
+              console.error(error.response.body);
+            }
             const notification = new Notification({
               title: "Error",
-              body: err,
+              body: error,
             });
           });
       }
-      BrowserWindow.getFocusedWindow().close();
     }
+    BrowserWindow.getFocusedWindow().close();
   });
 
   app.on("activate", () => {

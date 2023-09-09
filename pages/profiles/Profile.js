@@ -101,8 +101,8 @@ function LoadProfiles(profiles, selected) {
 function reactiveForm(ActiveUser, checkValue) {
   document.getElementById("name").value = ActiveUser.name;
   document.getElementById("mail").value = ActiveUser.mail;
-  document.getElementById("openerPic").value = ActiveUser.openerPic;
-  document.getElementById("QuestCheck").value = ActiveUser.QuestCheck;
+  document.getElementById("openerPic").checked = ActiveUser.openerPic ===true;
+  document.getElementById("QuestCheck").checked = ActiveUser.QuestCheck ===true;
   document.getElementById("Quest").value = ActiveUser.Quest;
   document.getElementById("QuestAnswer").value = ActiveUser.QuestAnswer || "";
   if (ActiveUser.QuestCheck === "true") {
@@ -126,8 +126,8 @@ function getUserObject(id) {
     id: id,
     name: document.getElementById("name").value,
     mail: document.getElementById("mail").value,
-    openerPic: document.getElementById("openerPic").value,
-    QuestCheck: document.getElementById("QuestCheck").value,
+    openerPic: document.getElementById("openerPic").checked,
+    QuestCheck: document.getElementById("QuestCheck").checked,
     Quest: document.getElementById("Quest").value,
     QuestAnswer: document.getElementById("QuestAnswer").value,
   };

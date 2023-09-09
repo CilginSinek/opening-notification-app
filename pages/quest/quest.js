@@ -1,6 +1,6 @@
 window.addEventListener("DOMContentLoaded",async()=>{
     const ActiveUser = await window.bridge.activeUserDetails()
-    // document.querySelector("label").innerText = ActiveUser.Quest
+    document.querySelector("label").innerText = ActiveUser.Quest
     const form = document.getElementById("form")
 
     form.addEventListener("submit",async()=>{

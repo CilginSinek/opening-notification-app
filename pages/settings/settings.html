@@ -4,22 +4,19 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
+      content="script-src 'self'"
     />
     <link rel="stylesheet" href="settings.css" />
     <title>System Settings</title>
   </head>
   <body>
     <div>
-      <form id="settingForm">
-        <label for="service_id">Service Id</label>
-        <input type="text" maxlength="24" id="service_id" name="service_id" />
+      <form id="settingsForm">
+        <label for="api_key">API Key</label>
+        <input type="text" maxlength="69" id="api_key" name="api_key" />
 
-        <label for="template_id">Template Id</label>
-        <input type="text" maxlength="24" id="template_id" name="template_id" />
-
-        <label for="public_key">Public Key</label>
-        <input type="text" maxlength="24" id="public_key" name="public_key" />
+        <label for="from_mail">Mailer Mail</label>
+        <input type="text" maxlength="24" id="from_mail" name="from_mail" />
 
         <input type="submit" class="btn save" value="Save">
       </form>
