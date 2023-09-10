@@ -15,6 +15,7 @@ Hala betada olan uygulama şuanlık AutoUpdater yok ve mail servisi mailinizi ol
 ### Kullanım
 
 #### Kurulum
+Exe dosyasını çalıştırarak ya da
 
 Kodu indirdikten sonra dosya konumunda
 ```bash
