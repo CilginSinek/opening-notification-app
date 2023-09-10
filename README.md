@@ -3,14 +3,14 @@
 ![AppView!](https://github.com/CilginSinek/opening-notification-app/blob/main/assets/App.png?raw=true)
 
 ## İçerik
-- [Açıklama-Kullanım](#Kullanim-Aciklama)
+- [Açıklama-Kullanım](#Açıklama-Kullanım)
 - [Kullanılan Teknolojiler](#KullanilanTeknolojiler)
 
 ## Açıklama-Kullanım
 
 ### Açıklama
 
-Hala betada olan uygulama Şuanlık Başlangıçta otomatik çalışmıyor, AutoUpdater yok ve Paket Exe oluşturulmadı. Uygulama bütün pencereleri kapattığınızda Icon olarak çalışmaya devam edecektir ve sadece Windows desteği vardır.
+Hala betada olan uygulama şuanlık AutoUpdater yok ve mail servisi mailinizi olduğundan daha geç gönderebilir. Uygulama bütün pencereleri kapattığınızda Icon olarak çalışmaya devam edecektir ve sadece Windows desteği vardır.
 
 ### Kullanım
 
