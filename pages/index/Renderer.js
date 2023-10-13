@@ -6,12 +6,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   const Settings = await window.bridge.getSettings();
 
   //* if haven't settings show settings button
-  if (Settings === undefined) {
+  if (Settings === undefined || Settings.mail === "" || Settings.pass === "") {
     const upper = document.querySelector(".upperContainer");
     const button = document.createElement("button");
-    button.onclick = async()=>{
+    button.onclick = async () => {
       await window.bridge.openSystemSettings();
-    }
+    };
     button.innerText = "Set System Settings";
     button.className = "btn systemsettings";
     upper.appendChild(button);
@@ -19,7 +19,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   //* Loading Old Profiles
   LoadProfiles(profiles, ActiveUserId);
-
+ 
   //* status
   const startButton = document.querySelector(".bigCircle");
   StartButtonChange(status);
@@ -29,7 +29,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     const thisStatus = await window.bridge.status();
     if (!thisStatus) {
       //! starting
-      if (profiles && document.querySelector("select").value && Settings !== undefined) {
+      if (
+        profiles.length > 0 &&
+        document.querySelector("select").value &&
+        Settings !== undefined &&
+        Settings.mail !== "" &&
+        Settings.pass !== ""
+      ) {
         console.log(document.querySelector("select").value);
         await window.bridge.changeStatus(!thisStatus);
         StartButtonChange(!thisStatus);
@@ -79,7 +85,7 @@ function LoadProfiles(profiles, selected) {
     AddButton.className = "btn AddProfileButton";
     AddButton.innerText = "Create New Profile";
     profileBody.appendChild(AddButton);
-    AddButton.onclick = async() => {
+    AddButton.onclick = async () => {
       console.log("settings");
       await window.bridge.openSettings();
     };

@@ -1,13 +1,30 @@
 {
   "name": "opening-notification-app",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "start": "electron ."
+    "start": "electron .",
+    "build-installer":"electron-builder"
+  },
+  "build":{
+    "appId":"opening-notification-app",
+    "win":{
+      "target":["nsis"],
+      "icon": "src/icon/icon.ico",
+      "requestedExecutionLevel":"requireAdministor"
+    },
+    "nsis":{
+      "installerIcon":"src/icon/icon.ico",
+      "uninstallerIcon":"src/icon/icon.ico",
+      "uninstallerDisplayName":"opening-notification-app",
+      "license":"LICENSE",
+      "oneClick":false,
+      "allowToChangeInstallationDirectory":true
+    }
   },
   "author": "",
   "license": "ISC",
@@ -18,9 +35,8 @@
     "electron": "^26.0.0"
   },
   "dependencies": {
-    "@sendgrid/mail": "^7.7.0",
-    "electron-store": "^8.1.0",
     "node-webcam": "^0.8.2",
+    "nodemailer": "^6.9.6",
     "uuid": "^9.0.0"
   }
 }

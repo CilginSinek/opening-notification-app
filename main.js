@@ -7,49 +7,25 @@ const {
   Notification,
 } = require("electron");
 const path = require("path");
-const Store = require("electron-store");
-const { v4: uuidv4 } = require("uuid");
-const NodeWebcam = require("node-webcam");
-const sgMail = require("@sendgrid/mail");
+const {
+  getProfile,
+  getStatus,
+  getSelectedId,
+  getActiveUserDetails,
+  getSettings,
+} = require("./controllers/GetFuncs");
+const {
+  setStatus,
+  setActiveUser,
+  setUser,
+  setSettings,
+} = require("./controllers/PatchFuncs");
+const { CreateUser, DeleteUser } = require("./controllers/AddDeleteFuncs");
+const { snapPhoto, SendMail } = require("./controllers/util");
 
-const msg = {
-  to: "",
-  from: "",
-  subject: "",
-  text: "",
-  html: ""
-};
+let tray = null;
 
-//! Store schema
-const schema = {
-  status: {
-    type: "boolean",
-    default: false,
-  },
-  Profiles: {
-    type: "array",
-  },
-  selectedProfileId: {
-    type: "string",
-  },
-  settings: {
-    type: "object",
-  },
-};
-
-//! Pic Options
-const opts = {
-  width: 300,
-  height: 200,
-  quality: 1,
-  frames: 1,
-  delay: 0,
-  saveShots: false,
-  output: "png",
-  device: false,
-  callbackReturn: "base64",
-  verbose: false,
-};
+let verify = false;
 
 //! About Page
 app.setAboutPanelOptions({
@@ -128,8 +104,6 @@ const mainMenuTemplate = [
 const mainmenu = Menu.buildFromTemplate(mainMenuTemplate);
 Menu.setApplicationMenu(mainmenu);
 
-const store = new Store({ schema });
-
 //! Windows
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -141,6 +115,7 @@ const createWindow = () => {
       contentSecurityPolicy:
         "default-src 'self' style-src 'self' 'unsafe-inline';",
     },
+    autoHideMenuBar: true,
   });
 
   mainWindow.loadFile(path.join(__dirname, "pages/index/index.html"));
@@ -156,7 +131,7 @@ const createProfilesWindow = () => {
       preload: path.join(__dirname, "preload.js"),
       contentSecurityPolicy: "script-src 'self' 'unsafe-inline';",
     },
-    // autoHideMenuBar: true,
+    autoHideMenuBar: true,
   });
 
   settingsWindow.loadFile(path.join(__dirname, "pages/profiles/Profiles.html"));
@@ -176,8 +151,9 @@ const createSettingsWindow = () => {
 
   settings.loadFile(path.join(__dirname, "pages/settings/settings.html"));
 };
+
 const createQuestWindow = () => {
-  const settings = new BrowserWindow({
+  const questWindow = new BrowserWindow({
     icon: path.join(__dirname, "icon/icon.png"),
     width: 465,
     height: 190,
@@ -187,78 +163,47 @@ const createQuestWindow = () => {
     },
     autoHideMenuBar: true,
   });
-
-  settings.loadFile(path.join(__dirname, "pages/quest/quest.html"));
-};
-
-//? Start with Windows Open
-app.setLoginItemSettings({
-  openAtLogin: true,
-});
-
-let tray = null;
-app.whenReady().then(() => {
-  // store.set("status",false)
-  if (store.get("status")) {
-    const profiles = store.get("Profiles");
-    const selected = profiles.find(
-      (item) => item.id === store.get("selectedProfileId")
-    );
-    if (selected.QuestCheck === true) {
-      createQuestWindow();
-    } else {
-      const { api_key, from_mail } = store.get("settings");
-      if (selected.openerPic === true) {
-        NodeWebcam.capture("test_picture", opts, function (err, data) {
-          if (err) {
-            console.log(err);
-            const notification = new Notification({
-              title: "Error",
-              body: err,
-            });
-          } else {
-            sgMail.setApiKey(api_key);
-            msg.from = from_mail;
-            msg.to = selected.mail;
-            msg.subject = "Notification App";
-            msg.text = `Bilgisayariniz ${new Date()} tarihinde fotograftaki sahıs tarafindan acildi.`;
-            msg.html = `<div><img src=${data} ></div>`;
-            console.log(msg)
-            sgMail
-              .send(msg)
-              .then((e) => {
-                console.log(e);
-              })
-              .catch((error) => {
-                console.log(error);
-                if (error.response) {
-                  console.error(error.response.body);
-                }
-              });
+  questWindow.on("closed", async () => {
+    if (verify) {
+      const activeUser = getActiveUserDetails();
+      if (activeUser.openerPic === true) {
+        snapPhoto();
+      } else {
+        await SendMail().catch((error) => {
+          const notification = new Notification({
+            title: "Error",
+            body: error,
+          });
+          if (error.response) {
+            console.error(error.response.body);
           }
         });
+      }
+    }
+  });
+
+  questWindow.loadFile(path.join(__dirname, "pages/quest/quest.html"));
+};
+//!start Func
+const startFunc = async () => {
+  if (getStatus()) {
+    const selected = getActiveUserDetails();
+    if (selected.QuestCheck === true) {
+      verify = true;
+      createQuestWindow();
+    } else {
+      if (selected.openerPic === true) {
+        snapPhoto();
       } else {
-        sgMail.setApiKey(api_key);
-        msg.from = from_mail;
-        msg.to = selected.mail;
-        msg.subject = "Notification App";
-        msg.text = `Bilgisayarınızı ${new Date()} tarihinde açıldı.`;
-        msg.html = "";
-        sgMail
-          .send(msg)
-          .then((e) => {
-            console.log(e);
-          })
-          .catch((error) => {
-            console.log(error);
-            if (error.response) {
-              console.error(error.response.body);
-            }
-            const notification = new Notification({
-              title: "Error",
-              body: error,
-            });
+        await SendMail().catch((error) => {
+          const notification = new Notification({
+            title: "Error",
+            body: error,
           });
+          if (error.response) {
+            console.error(error.response.body);
+          }
+        });
       }
       tray = new Tray(path.join(__dirname, "icon/icon.png"));
       tray.setContextMenu(contextMenu);
@@ -266,156 +211,63 @@ app.whenReady().then(() => {
   } else {
     createWindow();
   }
+};
+
+//? Start with Windows Open
+app.setLoginItemSettings({
+  openAtLogin: true,
+});
+
+app.whenReady().then(() => {
+  startFunc();
 
   ////! Funcs
   //* Get Profile List
-  ipcMain.handle("Profiles", () => store.get("Profiles"));
+  ipcMain.handle("Profiles", getProfile);
   //* Get status
-  ipcMain.handle("status", () => store.get("status"));
+  ipcMain.handle("status", getStatus);
   //* Get Active User
-  ipcMain.handle("activeUser", () => store.get("selectedProfileId"));
+  ipcMain.handle("activeUser", getSelectedId);
   //* Get Active User Details
-  ipcMain.handle("activeUserDetails", () => {
-    const profiles = store.get("Profiles");
-    const ActiveUserId = store.get("selectedProfileId");
-    const selectedUser = profiles.filter((item) => item.id === ActiveUserId);
-    return selectedUser[0];
-  });
+  ipcMain.handle("activeUserDetails", getActiveUserDetails);
   //* Get Settings
-  ipcMain.handle("getSettings", () => store.get("settings"));
+  ipcMain.handle("getSettings", getSettings);
 
   //* Change Status
-  ipcMain.on("changeStatus", (e, data) => store.set("status", data));
+  ipcMain.on("changeStatus", setStatus);
   //* Change Active User
-  ipcMain.on("activeUser", (e, data) => {
-    store.set("selectedProfileId", data);
-    store.set("status", false);
-    if (BrowserWindow.getAllWindows().length !== 1) {
-      BrowserWindow.getAllWindows().forEach((win) => {
-        if (BrowserWindow.getFocusedWindow.id !== win.id) {
-          win.webContents.reload();
-        }
-      });
-    }
-  });
-  //* Create New User
-  ipcMain.on("CreateUser", () => {
-    const profiles = store.get("Profiles");
-    const newData = { ...exampleUser, id: uuidv4() };
-    let newProfiles;
-    if (profiles) {
-      newProfiles = [...profiles, newData];
-    } else {
-      newProfiles = [newData];
-    }
-    store.set("selectedProfileId", newData.id);
-    store.set("Profiles", newProfiles);
-    store.set("status", false);
-    BrowserWindow.getAllWindows().forEach((win) => {
-      win.webContents.reload();
-    });
-  });
-  //* Delete User
-  ipcMain.on("DeleteUser", () => {
-    const activeUserId = store.get("selectedProfileId");
-    const profiles = store.get("Profiles");
-    const newProfiles = profiles.filter((item) => item.id !== activeUserId);
-    store.set("selectedProfileId", newProfiles[0].id);
-    store.set("Profiles", newProfiles);
-    store.set("status", false);
-    BrowserWindow.getAllWindows().forEach((win) => {
-      win.webContents.reload();
-    });
-  });
+  ipcMain.on("activeUser", setActiveUser);
+  //* Change User Settings
+  ipcMain.on("setUser", setUser);
+  //* Change Settings
+  ipcMain.on("setSettings", setSettings);
 
-  //* Set User Settings
-  ipcMain.on("setUser", (e, data) => {
-    const profiles = store.get("Profiles");
-    const newProfiles = profiles.map((item) => {
-      if (item.id === data.id) {
-        return data;
-      } else {
-        return item;
-      }
-    });
-    store.set("Profiles", newProfiles);
-    store.set("status", false);
-    BrowserWindow.getAllWindows().forEach((win) => {
-      win.webContents.reload();
-    });
-  });
+  //* Create New User
+  ipcMain.on("CreateUser", CreateUser);
+  //* Delete User
+  ipcMain.on("DeleteUser", DeleteUser);
+
   //* Open Profile Settings
   ipcMain.on("openSettings", () => createProfilesWindow());
   //* Open System Settings
   ipcMain.on("openSystemSettings", () => createSettingsWindow());
-  //* Set Settings
-  ipcMain.on("setSettings", (e, data) => {
-    store.set("settings", data);
-    store.set("status", false);
-    BrowserWindow.getFocusedWindow().close();
-    BrowserWindow.getAllWindows().forEach((win) => {
-      win.webContents.reload();
-    });
-  });
   //* Quest Response
-  ipcMain.on("questResponse", (e, data) => {
+  ipcMain.on("questResponse", async (e, data) => {
     if (!data.result) {
-      const { api_key, from_mail } = store.get("settings");
-      const selected = store
-        .get("Profiles")
-        .find((item) => item.id === store.get("selectedProfileId"));
       if (data.openerPic === true) {
-        NodeWebcam.capture("test_picture", opts, function (err, data) {
-          if (err) {
-            console.log(err);
-            const notification = new Notification({
-              title: "Error",
-              body: err,
-            });
-          } else {
-            sgMail.setApiKey(api_key);
-            msg.from = from_mail;
-            msg.to = selected.mail;
-            msg.subject = "Notification App";
-            msg.text = `Bilgisayariniz ${new Date()} tarihinde fotograftaki sahıs tarafindan acildi.`;
-            msg.html = `<div><img src=${data} ></div>`;
-            console.log(msg)
-            sgMail
-              .send(msg)
-              .then((e) => {
-                console.log(e);
-              })
-              .catch((error) => {
-                console.log(error);
-                if (error.response) {
-                  console.error(error.response.body);
-                }
-              });
+        snapPhoto();
+      } else {
+        await SendMail().catch((error) => {
+          const notification = new Notification({
+            title: "Error",
+            body: error,
+          });
+          if (error.response) {
+            console.error(error.response.body);
           }
         });
-      } else {
-        sgMail.setApiKey(api_key);
-        msg.from = from_mail;
-        msg.to = selected.mail;
-        msg.subject = "Notification App";
-        msg.text = `Bilgisayarınızı ${new Date()} tarihinde açıldı.`;
-        msg.html = "";
-        sgMail
-          .send(msg)
-          .then((e) => {
-            console.log(e);
-          })
-          .catch((error) => {
-            console.log(error);
-            if (error.response) {
-              console.error(error.response.body);
-            }
-            const notification = new Notification({
-              title: "Error",
-              body: error,
-            });
-          });
       }
+      verify = false;
     }
     BrowserWindow.getFocusedWindow().close();
   });
@@ -429,12 +281,3 @@ app.on("window-all-closed", () => {
   tray = new Tray(path.join(__dirname, "icon/icon.png"));
   tray.setContextMenu(contextMenu);
 });
-
-const exampleUser = {
-  name: "example",
-  mail: "example@gmail.com",
-  openerPic: false,
-  QuestCheck: false,
-  Quest: "",
-  QuestAnswer: "",
-};

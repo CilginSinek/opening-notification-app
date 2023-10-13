@@ -1,17 +1,18 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const myform = document.getElementById("settingsForm");
   const datas = await window.bridge.getSettings();
+  console.log(datas)
 
   if (datas !== undefined) {
-    document.getElementById("api_key").value = datas.api_key;
-    document.getElementById("from_mail").value = datas.from_mail;
+    document.getElementById("Mail").value = datas.mail;
+    document.getElementById("App_pass").value = datas.pass;
   }
 
   myform.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const api_key = document.getElementById("api_key").value,
-      from_mail = document.getElementById("from_mail").value;
-    const settingsData = { api_key, from_mail };
+    const mail = document.getElementById("Mail").value,
+      pass = document.getElementById("App_pass").value;
+    const settingsData = { mail, pass };
 
     //* send settings to api
     await window.bridge.setSettings(settingsData);

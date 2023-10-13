@@ -22,7 +22,7 @@ npm install && npm run make
 ```
 #### Sistem ayarları
 
-Email Alabilmek için [SendGrid](https://sendgrid.com/) sitesine giderek ilk başta hesap oluşturmanız gerekiyor. Hesap oluşturduktan sonra bir API key oluşturmanız ve Mail gönderici Mail adresini doğrulamanız gerek. Bunları Uygulamada kaydedip Email alabilirsiniz.
+Email Alabilmek için Google hesabınızdan bir "Uygulama Parolası" oluşturmanız gerekmektedir. Bu parolayı mail hesabınızla birlikte sistem ayarlarına yazarak mail alabilirsiniz.
 
 #### Profil oluşturma
 
@@ -30,5 +30,5 @@ Email Alabilmek için [SendGrid](https://sendgrid.com/) sitesine giderek ilk ba�
 
 ## Kullanılan Teknolojiler
 - ElectronJS
-- SendGrid
+- Nodemailer
 - Node-Webcam

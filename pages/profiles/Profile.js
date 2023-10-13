@@ -4,48 +4,45 @@ window.addEventListener("DOMContentLoaded", async () => {
   const QuestCheck = document.getElementById("QuestCheck");
   const CreateButton = document.getElementById("create");
   const DeleteButton = document.getElementById("delete");
-  let checkValue;
 
   CreateButton.onclick = async () => {
-    document.querySelector("select").remove()
+    document.querySelector("select").remove();
     await window.bridge.createUser();
     LoadProfiles(
       await window.bridge.profiles(),
       await window.bridge.activeUser()
     );
     const ActiveUserObj = await window.bridge.activeUserDetails();
-    reactiveForm(ActiveUserObj, checkValue);
+    reactiveForm(ActiveUserObj);
   };
 
   DeleteButton.onclick = async () => {
     const profiles = await window.bridge.profiles();
     if (profiles.length > 1) {
-      document.querySelector("select").remove()
+      document.querySelector("select").remove();
       await window.bridge.deleteUser();
       LoadProfiles(
         await window.bridge.profiles(),
         await window.bridge.activeUser()
       );
       const ActiveUserObj = await window.bridge.activeUserDetails();
-      reactiveForm(ActiveUserObj, checkValue);
+      reactiveForm(ActiveUserObj);
     }
   };
 
   QuestCheck.addEventListener("click", (e) => {
-    if (!checkValue) {
+    if (e.target.checked) {
       document.getElementById("Quest").setAttribute("required", "");
       document.getElementById("QuestAnswer").setAttribute("required", "");
 
       document.getElementById("QuestDiv").style.display = "flex";
       document.getElementById("QuestAnswerDiv").style.display = "flex";
-      checkValue = !checkValue;
     } else {
       document.getElementById("Quest").removeAttribute("required");
       document.getElementById("QuestAnswer").removeAttribute("required");
 
       document.getElementById("QuestDiv").style.display = "none";
       document.getElementById("QuestAnswerDiv").style.display = "none";
-      checkValue = !checkValue;
     }
   });
 
@@ -58,12 +55,15 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (profiles) {
     LoadProfiles(profiles, await window.bridge.activeUser());
     const ActiveUserObj = await window.bridge.activeUserDetails();
-    reactiveForm(ActiveUserObj, checkValue);
+    reactiveForm(ActiveUserObj);
   } else {
     await window.bridge.createUser();
-    LoadProfiles(await window.bridge.profiles(), await window.bridge.activeUser());
+    LoadProfiles(
+      await window.bridge.profiles(),
+      await window.bridge.activeUser()
+    );
     const ActiveUserObj = await window.bridge.activeUserDetails();
-    reactiveForm(ActiveUserObj, checkValue);
+    reactiveForm(ActiveUserObj);
   }
 });
 
@@ -77,12 +77,12 @@ function LoadProfiles(profiles, selected) {
     profileBody.appendChild(select);
 
     //* Eger yeni element secilirse formu ona gore refresh et
-    select.onchange = async(e)=>{
+    select.onchange = async (e) => {
       //? Active User idsi degisti, Form Degerleri duzenlendi
       await window.bridge.changeActive(e.target.value);
       const selectedObj = profiles.filter((item) => item.id === e.target.value);
       reactiveForm(selectedObj[0]);
-    }
+    };
     //* listemi olusturuyorum
     profiles.map((item) => {
       const option = document.createElement("option");
@@ -94,31 +94,30 @@ function LoadProfiles(profiles, selected) {
 
     //* Baslangicta Selected Useri duzgun vermesi icin
     //* append ettikten ve optionlari olusturduktan sonra deger atiyorum
-    select.value = selected
+    select.value = selected;
   }
 }
 
-function reactiveForm(ActiveUser, checkValue) {
+function reactiveForm(ActiveUser) {
   document.getElementById("name").value = ActiveUser.name;
   document.getElementById("mail").value = ActiveUser.mail;
-  document.getElementById("openerPic").checked = ActiveUser.openerPic ===true;
-  document.getElementById("QuestCheck").checked = ActiveUser.QuestCheck ===true;
+  document.getElementById("openerPic").checked = ActiveUser.openerPic === true;
+  document.getElementById("QuestCheck").checked =
+    ActiveUser.QuestCheck === true;
   document.getElementById("Quest").value = ActiveUser.Quest;
   document.getElementById("QuestAnswer").value = ActiveUser.QuestAnswer || "";
-  if (ActiveUser.QuestCheck === "true") {
+  if (ActiveUser.QuestCheck === true) {
     document.getElementById("Quest").setAttribute("required", "");
     document.getElementById("QuestAnswer").setAttribute("required", "");
 
-    document.getElementById("QuestAnswer").style.display = "flex";
-    document.getElementById("Quest").style.display = "flex";
-    checkValue = true;
+    document.getElementById("QuestAnswerDiv").style.display = "flex";
+    document.getElementById("QuestDiv").style.display = "flex";
   } else {
     document.getElementById("Quest").removeAttribute("required");
     document.getElementById("QuestAnswer").removeAttribute("required");
 
     document.getElementById("QuestAnswerDiv").style.display = "none";
     document.getElementById("QuestDiv").style.display = "none";
-    checkValue = false;
   }
 }
 function getUserObject(id) {
