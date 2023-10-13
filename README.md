@@ -10,12 +10,12 @@
 
 ### Açıklama
 
-Hala betada olan uygulama şuanlık AutoUpdater yok ve mail servisi mailinizi olduğundan daha geç gönderebilir. Uygulama bütün pencereleri kapattığınızda Icon olarak çalışmaya devam edecektir ve sadece Windows desteği vardır.
+Bilgisayarınız açıldığında size mail atan bir uygulamadır. Eğer isterseniz sorgu sistemiyle kontrollü bir şekilde bildirim atma özelliği mevcuttur. Şimdilik AutoUpdater özelliği yoktur. Uygulama bütün pencereleri kapattığınızda Icon olarak çalışmaya devam edecektir ve sadece Windows desteği vardır.
 
 ### Kullanım
 
 #### Kurulum
-Exe dosyasını çalıştırarak ya da
+[Exe](https://github.com/CilginSinek/opening-notification-app/releases/tag/v1.0.0) dosyasını çalıştırarak ya da
 
 Kodu indirdikten sonra dosya konumunda
 ```bash
