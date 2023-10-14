@@ -115,7 +115,6 @@ const createWindow = () => {
       contentSecurityPolicy:
         "default-src 'self' style-src 'self' 'unsafe-inline';",
     },
-    autoHideMenuBar: true,
   });
 
   mainWindow.loadFile(path.join(__dirname, "pages/index/index.html"));
