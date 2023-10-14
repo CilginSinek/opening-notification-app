@@ -51,7 +51,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 function LoadProfiles(profiles, selected) {
   const profileBody = document.querySelector(".profiles-body");
 
-  if (profiles) {
+  if (profiles.length) {
     //* select area
     const select = document.createElement("select");
     select.onchange = async (e) => {
