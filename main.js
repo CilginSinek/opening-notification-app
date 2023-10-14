@@ -30,9 +30,9 @@ let verify = false;
 //! About Page
 app.setAboutPanelOptions({
   applicationName: "Opening Notification App",
-  applicationVersion: "version: 0.0.1",
+  applicationVersion: "version: 1.0.0",
   authors: ["CilginSinek"],
-  version: "0.0.1",
+  version: "1.0.0",
 });
 
 //! Tray Context Menu
